@@ -1,0 +1,11 @@
+
+.cont{
+ display: flex;
+
+}
+.others{
+    padding: 1rem;
+    flex: 4;
+    background-color: rgb(244, 249, 248);
+}
+
