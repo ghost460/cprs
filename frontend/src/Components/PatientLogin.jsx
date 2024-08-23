@@ -63,7 +63,7 @@ function PatientLogin() {
                     </button>
                     <div className="register mt-3">
                       If you do not have an account?{" "}
-                      <Link to="/PatientReg">Register Here</Link>
+                      <Link to="/Emailverify">Register Here</Link>
                     </div>
                   </div>
                 </form>

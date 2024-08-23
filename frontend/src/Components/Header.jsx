@@ -19,7 +19,7 @@ function Header() {
               About Us
             </Nav.Link>
             <Nav.Link href="#pricing">Contact Us</Nav.Link>
-            <Nav.Link href="#pricing">Contact Us</Nav.Link>
+           
           </Nav>
         </Container>
       </Navbar>

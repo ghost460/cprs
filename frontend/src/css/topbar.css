@@ -1,0 +1,51 @@
+.topbar{
+    width: 100%;
+    height: 50px;
+    background-color: white;
+    position:sticky;
+    top: 0;
+    z-index: 999;
+    background-color: rgb(5, 5, 159);
+}
+.topbarwrapper{
+    height: 100%;
+    padding: 0px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.topNotifiIcon{
+    position: relative;
+    color: white;
+}
+.topIconBag{
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    top:-5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    
+
+}
+.right{
+    display: flex;
+    align-items: center;
+    padding: 3px;
+}
+.logOutIcon, .UserIcon {
+    padding: 10px;
+    color: rgb(255, 255, 255);
+}
+.left{
+    .logo{
+        font-size: 1rem;
+        color: white;
+    }
+}

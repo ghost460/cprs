@@ -1,0 +1,185 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  username        String           @unique
+  password        String
+  role            Role
+  doctor          Doctor?          @relation(fields: [doctorId], references: [id])
+  labTechnician   LabTechnician?   @relation(fields: [labTechnicianId], references: [id])
+  Hospital          Hospital?       @relation(fields: [HospitalId], references: [id])
+
+  doctorId        Int?             @unique
+  labTechnicianId Int?             @unique
+  HospitalId        Int?             @unique
+}
+
+enum Role {
+  DOCTOR
+  LAB_TECHNICIAN
+  ADMIN
+}
+
+model Doctor {
+  id              Int               @id @default(autoincrement())
+  fullName        String
+  address         String
+  contactNo       String
+  email           String
+  licenseNo       String
+  specialization  String
+  experience      Int
+  profilePicture  String?
+  user            User?
+  medicalHistories MedicalHistory[]
+  hospitals       DoctorHospital[]
+}
+
+
+model Patient {
+  id                    Int                @id @default(autoincrement())
+  fullName              String
+  dateOfBirth           DateTime
+  gender                Gentertype
+  add_province          String
+  add_district          String
+  add_munciplity        String
+  add_wardno            Int
+  add_area              String
+  doc_type              DocumentType 
+  doc_number            String
+  contactNo             String
+  email                 String             @unique
+  fathername            String
+  emergencyContactName  String
+  bloodType             String
+  allergies             Allergy[]          // Relation to Allergy model
+  password              String     
+  profilePicture        String?
+  dateOfRegistration    DateTime
+  medicalHistories      MedicalHistory[] //Relation to MedicalHistory model 
+  
+}
+enum DocumentType {
+  CITIZENSHIP
+  DRIVING_LICENSE
+  PASSPORT
+  BIRTH_CERTIFICATE
+
+}
+enum Gentertype {
+  MALE
+  FEMALE
+  OTHER
+
+}
+
+model MedicalHistory {
+  id                 Int      @id @default(autoincrement())
+  visitDate          DateTime
+  problem            String
+  labTestReportDoc   String?  // URL or path to the lab test report document
+  labTestReport      String?  // Description or notes on lab test report
+  doctorPrescription String  // precriped medician to the patient
+  
+  doctorId           Int?     
+  precripted_doctor  Doctor?  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  patientId          Int
+  patient            Patient  @relation(fields: [patientId], references: [id])
+}
+model Allergy {
+  id        Int     @id @default(autoincrement())
+  name      String
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId Int
+}
+
+
+model LabTechnician {
+  id            Int      @id @default(autoincrement())
+  fullName      String
+  address       String
+  contactNo     String
+  specialization String
+  experience    Int
+  profilePicture String?
+
+  user User?
+}
+
+model Hospital {
+  id                   Int                   @id @default(autoincrement())
+  hospitalName         String
+  address              String
+  numberOfBeds         Int
+  email                String
+  specialization       String
+  organizationalType   String
+  levelOfCare          String
+  servicesOffered      ServicesOffered       @relation(fields: [servicesOfferedId], references: [id])
+  servicesOfferedId    Int                   @unique
+  availableEquipments  AvailableEquipments   @relation(fields: [availableEquipmentsId], references: [id])
+  availableEquipmentsId Int                  @unique
+  contactNumbers       ContactNumbers        @relation(fields: [contactNumbersId], references: [id])
+  contactNumbersId     Int                   @unique
+  
+  user          User?
+  doctors              DoctorHospital[]
+
+  
+ 
+}
+model DoctorHospital {
+  doctorId   Int
+  hospitalId Int
+
+  doctor     Doctor   @relation(fields: [doctorId], references: [id])
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+
+  @@id([doctorId, hospitalId])
+}
+
+model ServicesOffered {
+  id         Int     @id @default(autoincrement())
+  emergency  Boolean
+  surgical   Boolean
+  diagnostic Boolean
+  hospital   Hospital?
+}
+
+model AvailableEquipments {
+  id         Int     @id @default(autoincrement())
+  xray       Boolean
+  mri        Boolean
+  ctScanner  Boolean
+  ecg        Boolean
+  endoscopy  Boolean
+  ventilator Boolean
+  cpap       Boolean
+  bipap      Boolean
+  hospital   Hospital?
+}
+
+model ContactNumbers {
+  id          Int     @id @default(autoincrement())
+  reception   String
+  infoOfficer String
+  emergency   String
+  hospital    Hospital?
+}
+
+
+
+ 
+
+
+
+

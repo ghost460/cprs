@@ -1,6 +1,8 @@
 // models/Patient.js
 
 const mongoose = require('mongoose');
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const medicalHistorySchema = new mongoose.Schema({
   date: {
@@ -63,14 +65,11 @@ const vaccinationSchema = new mongoose.Schema({
 }, { _id: false });
 
 const patientSchema = new mongoose.Schema({
-  firstName: {
+  fullName: {
     type: String,
     required: true,
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
+  
   dateOfBirth: {
     type: Date,
     required: true,
@@ -123,6 +122,43 @@ patientSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+patientSchema.pre("save", async   function(next){
+    if(!this.isModified("password")) return next();
+ this.password =bcrypt.hash(this.password, 10)
+ next()   
+
+})
+patientSchema.method.ispasswordcorrect= async function (password) {
+return await bcrypt.compare(password, this.password)    
+}
+patientSchema.method.generateAccessToken=function(){
+return jwt.sign(
+    {
+        _id: this._id,
+        email:this.email,
+        fullName: this.fullName,
+        username:this.username
+
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+    }
+)    
+}
+patientSchema.method.generateRefreshToken=function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )    
+    }
 
 const Patient = mongoose.model('Patient', patientSchema);
 
