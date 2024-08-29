@@ -11,6 +11,7 @@ model User {
   id              Int              @id @default(autoincrement())
   username        String           @unique
   password        String
+  refreshToken    String?
   role            Role
   doctor          Doctor?          @relation(fields: [doctorId], references: [id])
   labTechnician   LabTechnician?   @relation(fields: [labTechnicianId], references: [id])
@@ -18,7 +19,7 @@ model User {
 
   doctorId        Int?             @unique
   labTechnicianId Int?             @unique
-  HospitalId        Int?             @unique
+  HospitalId      Int?             @unique
 }
 
 enum Role {
@@ -31,9 +32,9 @@ model Doctor {
   id              Int               @id @default(autoincrement())
   fullName        String
   address         String
-  contactNo       String
-  email           String
-  licenseNo       String
+  contactNo       String    @unique
+  email           String    @unique
+  licenseNo       String    @unique
   specialization  String
   experience      Int
   profilePicture  String?
@@ -80,21 +81,41 @@ enum Gentertype {
   OTHER
 
 }
-
 model MedicalHistory {
-  id                 Int      @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   visitDate          DateTime
-  problem            String
-  labTestReportDoc   String?  // URL or path to the lab test report document
-  labTestReport      String?  // Description or notes on lab test report
-  doctorPrescription String  // precriped medician to the patient
-  
-  doctorId           Int?     
-  precripted_doctor  Doctor?  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  bloodPressure      String?
+  weight             Float?
+  currentProblem     String
+  refersToTest       Boolean   // Whether the doctor refers to a lab test
+  labtesttype        String
+  LabtestItems       String
+  doctorPrescription String    // Prescribed medication for the patient
+
+  doctorId           Int?
+  precripted_doctor  Doctor?   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   patientId          Int
-  patient            Patient  @relation(fields: [patientId], references: [id])
+  patient            Patient   @relation(fields: [patientId], references: [id])
+
+  hospitalId         Int
+  hospital           Hospital  @relation(fields: [hospitalId], references: [id])
+
+  labTest            LabTest?  // Don't define fields, references, or onDelete here
 }
+
+model LabTest {
+  id                Int      @id @default(autoincrement())
+  labTestReportDoc  String?  // URL or path to the lab test report document
+  labTestReport     String?  // Description or notes on the lab test report
+  labTechnicianId   Int
+  labTechnician     LabTechnician @relation(fields: [labTechnicianId], references: [id])
+
+  medicalHistoryId  Int   @unique
+  medicalHistory    MedicalHistory @relation(fields: [medicalHistoryId], references: [id], onDelete: Cascade)
+}
+
+
 model Allergy {
   id        Int     @id @default(autoincrement())
   name      String
@@ -113,6 +134,7 @@ model LabTechnician {
   profilePicture String?
 
   user User?
+   labTests         LabTest[]
 }
 
 model Hospital {
@@ -133,6 +155,7 @@ model Hospital {
   
   user          User?
   doctors              DoctorHospital[]
+  medicalHistories MedicalHistory[]
 
   
  

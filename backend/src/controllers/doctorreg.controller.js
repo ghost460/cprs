@@ -102,3 +102,63 @@ export const searchDoctor = async (req, res) => {
         res.status(500).json({ error: "An error occurred while searching for the doctor." });
     }
 };
+
+//update controller 
+export const updateDoctor = ascynHandlar(async (req, res) => {
+    const { id } = req.params; // Get the doctor ID from the request params
+    const { fullName, address, contactNo, email, licenseNo, username, password, specialization, experience } = req.body;
+    const profilePictureLocalPath = req.files?.profilePicture?.[0]?.path; // Safely access profilePicture
+  
+    try {
+      // Check if the doctor exists
+      const existingDoctor = await prisma.doctor.findUnique({
+        where: { id: parseInt(id) },
+      });
+  
+      if (!existingDoctor) {
+        return res.status(404).json({ error: "Doctor not found." });
+      }
+  
+      // Upload profile picture if provided
+      let profilePicture = existingDoctor.profilePicture; // retain the old profile picture by default
+  
+      if (profilePictureLocalPath) {
+        profilePicture = await uploadoncloud(profilePictureLocalPath);
+      }
+  
+      // Hash the password before saving it if provided
+      const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+  
+      // Update the doctor record
+      const updatedDoctor = await prisma.doctor.update({
+        where: { id: parseInt(id) },
+        data: {
+          fullName,
+          address,
+          contactNo,
+          email,
+          licenseNo,
+          specialization,
+          experience: parseInt(experience, 10),
+          profilePicture: profilePicture ? profilePicture.url : existingDoctor.profilePicture,
+          user: {
+            update: {
+              username,
+              // Only update password if a new one is provided
+              ...(hashedPassword && { password: hashedPassword }),
+            },
+          },
+        },
+      });
+  
+      res.json({ message: 'Doctor updated successfully', updatedDoctor });
+    } catch (error) {
+      console.error("Error updating doctor data:", error);
+      if (error instanceof Apierror) {
+        res.status(error.statusCode).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'An error occurred while updating the doctor.' });
+      }
+    }
+  });
+  

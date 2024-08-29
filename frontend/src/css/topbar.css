@@ -42,10 +42,42 @@
 .logOutIcon, .UserIcon {
     padding: 10px;
     color: rgb(255, 255, 255);
+    cursor: pointer; /* Change mouse pointer to hand */
+}
+
+.logOutIcon:hover, .UserIcon:hover {
+    color: rgb(237, 186, 186); /* Change the color on hover */
 }
 .left{
     .logo{
         font-size: 1rem;
         color: white;
+        
     }
 }
+.topbarwrapper .right .userInfo {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    color:wheat;
+  }
+  
+  .topbarwrapper .right .userInfo .profilePicture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .topbarwrapper .right .userInfo .userName {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .topbarwrapper .right .userInfo .userRole {
+    color: rgb(251, 3, 3);
+    margin-right:20px ;
+  }
+  
+
+

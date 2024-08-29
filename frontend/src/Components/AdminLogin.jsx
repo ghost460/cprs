@@ -2,23 +2,48 @@ import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Dashboard from "./Dashboard";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function AdminLogin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (email === "" || password === "") {
+    if (username === "" || password === "") {
       setError("Please fill in all fields");
       return;
     }
 
     setError("");
     // Perform login logic here
-    console.log("Login successful", { email, password });
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/loginUser",
+        {
+          username,
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        const { userData } = response.data;
+        console.log("Login successful", userData);
+
+        // Navigate to the Home route with userData
+        localStorage.setItem("user", JSON.stringify(userData));
+        navigate("/Home");
+      }
+
+      // Handle successful login (e.g., redirect to the dashboard)
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -34,15 +59,15 @@ function AdminLogin() {
                 {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email address
+                    <label htmlFor="username" className="form-label">
+                      Username:
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       className="form-control"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
                   <div className="mb-3">
@@ -61,9 +86,7 @@ function AdminLogin() {
                     <button type="submit" className="btn btn-primary">
                       Login
                     </button>
-                    <div className="register mt-3">
-                      if you do not have account? Register Here
-                    </div>
+                    <div className="register mt-3"></div>
                   </div>
                 </form>
               </div>

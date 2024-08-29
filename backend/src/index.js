@@ -9,7 +9,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 const app = express()
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: 'http://localhost:5173',
     credentials: true
 }));
 
@@ -42,6 +42,33 @@ app.use("/api/patientreg", patientregrouter)
 //importing Doctor Registration and implementation
 import doctorrouter from "./routes/doctorreg.router.js";
 app.use("/api/DoctorReg", doctorrouter);
+
+//login user
+
+import userauthroutes from "./routes/userAuth.routes.js";
+app.use("/api",userauthroutes);
+
+//add doctor to the hospital 
+import addDoctorToHos from "./routes/addDoctorToHospital.router.js";
+app.use("/api", addDoctorToHos);
+ //search patient 
+ import searchPatientrouter from "./routes/searchPatient.router.js";
+ app.use("/api", searchPatientrouter);
+
+ //search doctors which are work in particular hospitals 
+ import hospitaldoctorsrouter from "./routes/searchHospitalsDoctors.route.js";
+ app.use("/api",hospitaldoctorsrouter)
+
+
+ //patient medicatl history create
+ import patientHsitoryrouter from "./routes/medicalHistory.route.js";
+ app.use("/api", patientHsitoryrouter);
+
+ import patientListAssignToDoctorrouter from "./routes/getPatientAssignToDoctor.router.js";
+ app.use("/api",patientListAssignToDoctorrouter);
+
+
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

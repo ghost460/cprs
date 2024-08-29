@@ -1,5 +1,6 @@
 
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 export const registerHospital = async (req, res) => {
@@ -18,7 +19,17 @@ export const registerHospital = async (req, res) => {
     password,
   } = req.body;
 
+  
+
   try {
+      //check existing user 
+    const existingUser = await prisma.user.findUnique({
+      where: { username },
+    });
+  
+    if (existingUser) {
+      throw new Apierror(409, "User already exists");
+    }
     // Create servicesOffered entry
     const servicesOfferedEntry = await prisma.servicesOffered.create({
       data: servicesOffered,
@@ -33,6 +44,7 @@ export const registerHospital = async (req, res) => {
     const contactNumbersEntry = await prisma.contactNumbers.create({
       data: contactNumbers,
     });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create hospital entry
     const hospital = await prisma.hospital.create({
@@ -50,7 +62,7 @@ export const registerHospital = async (req, res) => {
         user: {
           create: {
             username,
-            password,
+            password:hashedPassword,
             role: 'ADMIN', // assuming the role for hospital registration is ADMIN
           },
         },

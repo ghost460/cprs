@@ -22,6 +22,12 @@ export default function Sidebar() {
               </Link>
             </li>{" "}
             <li className="sidebarItem">
+              <Link Link to="/AssignDoctorToPatient">
+                <PersonAddIcon />
+                <span>AssignDoctorToPatient</span>
+              </Link>
+            </li>
+            <li className="sidebarItem">
               <Link Link to="/HospitalRegistration">
                 <PersonAddIcon />
                 <span>Add Hospital</span>
@@ -40,8 +46,10 @@ export default function Sidebar() {
               </Link>
             </li>
             <li className="sidebarItem">
-              <StorageIcon />
-              <span>Crime Record</span>
+              <Link to="/PatientList">
+                <StorageIcon />
+                <span>PatientList</span>
+              </Link>
             </li>
           </ul>
         </div>

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Col, Row, Table } from "react-bootstrap";
 import axios from "axios";
-import Adminpanel from "../Adminpanel";
+import UpdateDoctor from "./UpdateDoctor";
 
 function SearchDoctor() {
   const [searchData, setSearchData] = useState({
@@ -12,7 +12,27 @@ function SearchDoctor() {
   });
 
   const [result, setResult] = useState(null);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [hospitalId, setHospitalId] = useState(null);
 
+  useEffect(() => {
+    // Retrieve the user data from local storage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      // Parse the JSON string to an object
+      const parsedData = JSON.parse(userData);
+      // Extract the HospitalId
+      const storedHospitalId = parsedData.HospitalId;
+      if (storedHospitalId) {
+        setHospitalId(parseInt(storedHospitalId, 10));
+      } else {
+        console.error("Hospital ID not found in user data.");
+      }
+    } else {
+      console.error("User data not found in local storage.");
+    }
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSearchData({ ...searchData, [name]: value });
@@ -22,7 +42,7 @@ function SearchDoctor() {
     e.preventDefault();
 
     axios
-      .get("http://localhost:5000/api/doctor/search", {
+      .get("http://localhost:5000/api/DoctorReg/Searchdoctor", {
         params: searchData,
       })
       .then((response) => {
@@ -34,13 +54,9 @@ function SearchDoctor() {
       });
   };
 
-  const handleAdd = () => {
-    // Logic for adding a new doctor or handling the add functionality
-  };
-
   const handleUpdate = (doctorId) => {
-    // Logic for updating the doctor's information
-    console.log("Update doctor with ID:", doctorId);
+    setSelectedDoctorId(doctorId);
+    setShowUpdateForm(true);
   };
 
   const handleDelete = (doctorId) => {
@@ -55,12 +71,37 @@ function SearchDoctor() {
       });
   };
 
+  const handleAddDoctor = (doctorId) => {
+    if (!hospitalId) {
+      alert("Hospital ID not found in local storage.");
+      return;
+    }
+
+    axios
+      .post("http://localhost:5000/api/addDoctorToHospital", {
+        doctorId,
+        hospitalId,
+      })
+      .then(() => {
+        alert("Doctor added to hospital successfully.");
+      })
+      .catch((error) => {
+        alert("Something went wrong adding doctor to the hospital");
+        console.error("Error adding doctor to hospital:", error);
+      });
+  };
+
+  const closeUpdateForm = () => {
+    setShowUpdateForm(false);
+    setSelectedDoctorId(null);
+  };
+
   return (
     <Container>
       <Form onSubmit={handleSearch}>
         <Row>
           <Col md={3}>
-            <Form.Group controlId="id">
+            <Form.Group controlId="S_id">
               <Form.Label>ID</Form.Label>
               <Form.Control
                 type="text"
@@ -71,7 +112,7 @@ function SearchDoctor() {
             </Form.Group>
           </Col>
           <Col md={3}>
-            <Form.Group controlId="licenseNo">
+            <Form.Group controlId="S_licenseNo">
               <Form.Label>License Number</Form.Label>
               <Form.Control
                 type="text"
@@ -82,7 +123,7 @@ function SearchDoctor() {
             </Form.Group>
           </Col>
           <Col md={3}>
-            <Form.Group controlId="email">
+            <Form.Group controlId="S_email">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
@@ -93,7 +134,7 @@ function SearchDoctor() {
             </Form.Group>
           </Col>
           <Col md={3}>
-            <Form.Group controlId="contactNo">
+            <Form.Group controlId="S_contactNo">
               <Form.Label>Contact Number</Form.Label>
               <Form.Control
                 type="text"
@@ -131,9 +172,6 @@ function SearchDoctor() {
               <td>{result.licenseNo}</td>
               <td>{result.specialization}</td>
               <td>
-                <Button variant="success" onClick={handleAdd} className="me-2">
-                  Add
-                </Button>
                 <Button
                   variant="warning"
                   onClick={() => handleUpdate(result.id)}
@@ -147,10 +185,25 @@ function SearchDoctor() {
                 >
                   Delete
                 </Button>
+                <Button
+                  variant="success"
+                  onClick={() => handleAddDoctor(result.id)} // Fixed here
+                  className="ms-2"
+                >
+                  Add Doctor
+                </Button>
               </td>
             </tr>
           </tbody>
         </Table>
+      )}
+
+      {showUpdateForm && selectedDoctorId && (
+        <UpdateDoctor
+          doctorId={selectedDoctorId}
+          onClose={closeUpdateForm}
+          onDoctorUpdated={() => setResult(null)}
+        />
       )}
     </Container>
   );
