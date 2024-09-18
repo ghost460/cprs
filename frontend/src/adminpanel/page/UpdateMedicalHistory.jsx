@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
   const [formData, setFormData] = useState({
+    id: medicalHistoryId,
     bloodPressure: "",
     weight: "",
     currentProblem: "",
@@ -22,9 +23,30 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
       if (medicalHistoryId) {
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/medicalHistory/${medicalHistoryId}`
+            `http://localhost:5000/api/getMedicalHistory?id=${medicalHistoryId}`
           );
-          setFormData(response.data);
+          const {
+            id,
+            bloodPressure,
+            weight,
+            currentProblem,
+            refersToTest,
+            labtesttype,
+            LabtestItems,
+            doctorPrescription,
+          } = response.data.data?.[0] || {};
+          //   console.log(response.data.data);
+
+          setFormData({
+            id,
+            bloodPressure,
+            weight,
+            currentProblem,
+            refersToTest,
+            labtesttype,
+            LabtestItems,
+            doctorPrescription,
+          });
         } catch (err) {
           console.error("Error fetching medical history:", err);
           setError("Failed to fetch medical history.");
@@ -47,7 +69,7 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://localhost:5000/api/medicalHistory/${medicalHistoryId}`,
+        `http://localhost:5000/api/updateMedicalHistory/${medicalHistoryId}`,
         formData
       );
       setSuccess("Medical history updated successfully.");

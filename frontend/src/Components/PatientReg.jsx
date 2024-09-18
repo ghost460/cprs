@@ -3,8 +3,10 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Dashboard from "./Dashboard";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function PatientRegistration() {
+  const nevigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -54,6 +56,8 @@ function PatientRegistration() {
       .then((response) => {
         console.log("Patient data submitted successfully:", response.data);
         alert("Patient Registration successfully");
+        nevigate("/PatientLogin");
+
         // Handle success (e.g., redirect, show a message)
       })
       .catch((error) => {

@@ -11,9 +11,9 @@ const ViewMedicalHistory = ({ patientId }) => {
     const fetchMedicalHistory = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/medicalHistory/${patientId}`
+          `http://localhost:5000/api/getMedicalHistory?patient=${patientId}`
         );
-        setMedicalHistory(response.data);
+        setMedicalHistory(response.data.data);
       } catch (err) {
         console.error("Error fetching medical history:", err);
         setError("Failed to fetch medical history.");
@@ -48,8 +48,8 @@ const ViewMedicalHistory = ({ patientId }) => {
                 {medicalHistory.map((history) => (
                   <tr key={history.id}>
                     <td>{history.id}</td>
-                    <td>{history.hospitalName}</td>
-                    <td>{history.doctorName}</td>
+                    <td>{history.hospital.hospitalName}</td>
+                    <td>{history.precripted_doctor.fullName}</td>
                     <td>{history.bloodPressure}</td>
                     <td>{history.weight}</td>
                     <td>{history.currentProblem}</td>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import Adminpanel from "../Adminpanel";
 import axios from "axios";
@@ -15,6 +15,15 @@ const LabTechnicianForm = () => {
     password: "",
   });
 
+  const [hospitalId, setHospitalId] = useState(null);
+
+  useEffect(() => {
+    // Extract hospitalId from local storage
+    const userData = localStorage.getItem("user");
+    const { HospitalId } = JSON.parse(userData);
+    setHospitalId(HospitalId);
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -30,6 +39,7 @@ const LabTechnicianForm = () => {
     Object.keys(formData).forEach((key) => {
       formDataToSend.append(key, formData[key]);
     });
+    formDataToSend.append("hospitalId", hospitalId);
 
     try {
       const response = await axios.post(

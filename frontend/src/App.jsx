@@ -26,6 +26,9 @@ import AssignDoctorToPatient from "./adminpanel/page/AssignDoctorToPatient.jsx";
 import PatientList from "./adminpanel/page/PatientList.jsx";
 import PatientMedicalHistory from "./adminpanel/page/PatientMedicalHistory.jsx";
 import UpdateMedicalHistory from "./adminpanel/page/UpdateMedicalHistory.jsx";
+import LabTestList from "./adminpanel/page/LabTestList.jsx";
+import LabTestForm from "./adminpanel/page/LabtestForm.jsx";
+import PatientView from "./adminpanel/page/PatientView.jsx";
 
 function App() {
   return (
@@ -42,7 +45,13 @@ function App() {
             path="/Home"
             element={
               <ProtectedRoute
-                allowedRoles={["ADMIN", "DOCTOR", "LAB_TECHNICIAN"]}
+                allowedRoles={[
+                  "SUPERADMIN",
+                  "ADMIN",
+                  "DOCTOR",
+                  "LAB_TECHNICIAN",
+                  "PATIENT",
+                ]}
               >
                 <Adminpanel />
               </ProtectedRoute>
@@ -51,15 +60,36 @@ function App() {
           <Route
             path="/HospitalRegistration"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
                 {" "}
                 <Hospitalregister />{" "}
               </ProtectedRoute>
             }
           />
-          <Route path="/LabTecnicianReg" element={<LabTechnicianForm />} />
-          <Route path="/DoctorRegistration" element={<DoctorReg />} />
-          <Route path="/SearchDoctor" element={<SearchDoctor />} />
+          <Route
+            path="/LabTecnicianReg"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <LabTechnicianForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DoctorRegistration"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <DoctorReg />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/SearchDoctor"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <SearchDoctor />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/AssignDoctorToPatient"
             element={
@@ -89,6 +119,32 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["DOCTOR"]}>
                 <UpdateMedicalHistory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/LabTestList"
+            element={
+              <ProtectedRoute allowedRoles={["LAB_TECHNICIAN"]}>
+                <LabTestList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/LabTestReport/:Id"
+            element={
+              <ProtectedRoute allowedRoles={["LAB_TECHNICIAN"]}>
+                <LabTestForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ViewPatientDetails"
+            element={
+              <ProtectedRoute allowedRoles={["PATIENT"]}>
+                <PatientView />
               </ProtectedRoute>
             }
           />

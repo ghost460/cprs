@@ -14,7 +14,8 @@ const LabTechReg = ascynHandlar(async (req, res) => {
     specialization,
     experience,
     username,
-    password
+    password,
+    hospitalId
   } = req.body;
 
   try {
@@ -39,7 +40,7 @@ const LabTechReg = ascynHandlar(async (req, res) => {
     if (profilePictureLocalPath) {
       profilePicture = await uploadoncloud(profilePictureLocalPath);
     }
-
+    
     // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -52,6 +53,7 @@ const LabTechReg = ascynHandlar(async (req, res) => {
         specialization,
         experience: parseInt(experience, 10),
         profilePicture:profilePicture.url,
+        hospitalId:parseInt(hospitalId),
         user: {
           create: {
             username,

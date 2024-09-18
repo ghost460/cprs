@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UpdateMedicalHistory from "./UpdateMedicalHistory";
 import ViewMedicalHistory from "./ViewMedicalHistory";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Adminpanel from "../Adminpanel";
+import { useLocation } from "react-router-dom";
 
 const PatientMedicalHistory = () => {
-  const [activeView, setActiveView] = useState("view"); // Default to 'view'
+  const [activeView, setActiveView] = useState("update"); // Default to 'view'
   const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const location = useLocation();
+  const { fullName, patientId, Id: medicalHistoryId } = location.state;
 
   const handleViewClick = () => {
     setActiveView("view");
@@ -16,6 +19,10 @@ const PatientMedicalHistory = () => {
   const handleUpdateClick = () => {
     setActiveView("update");
   };
+
+  useEffect(() => {
+    setSelectedPatientId(patientId);
+  }, [patientId]);
 
   return (
     <Adminpanel>
@@ -41,14 +48,14 @@ const PatientMedicalHistory = () => {
         </Row>
         <Row>
           <Col>
-            {activeView === "update" && selectedPatientId && (
+            {activeView === "update" && medicalHistoryId && (
               <UpdateMedicalHistory
-                medicalHistoryId={selectedPatientId}
+                medicalHistoryId={medicalHistoryId}
                 onClose={() => setActiveView("view")}
               />
             )}
-            {activeView === "view" && selectedPatientId && (
-              <ViewMedicalHistory patientId={selectedPatientId} />
+            {activeView === "view" && patientId && (
+              <ViewMedicalHistory patientId={patientId} />
             )}
           </Col>
         </Row>

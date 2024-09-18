@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Dashboard from "./Dashboard";
+import axios from "axios";
 
 function PatientLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (email === "" || password === "") {
@@ -19,8 +21,31 @@ function PatientLogin() {
 
     setError("");
     // Perform login logic here
-    console.log("Login successful", { email, password });
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/loginPatient",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        const { userData } = response.data;
+        console.log("Login successful", userData);
+
+        // Navigate to the Home route with userData
+        localStorage.setItem("user", JSON.stringify(userData));
+        navigate("/Home");
+      }
+
+      // Handle successful login (e.g., redirect to the dashboard)
+    } catch (err) {
+      setError(err.message);
+    }
   };
+
   return (
     <Dashboard>
       <Container className="d-flex justify-content-center  vh-100">

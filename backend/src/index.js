@@ -67,8 +67,17 @@ app.use("/api", addDoctorToHos);
  import patientListAssignToDoctorrouter from "./routes/getPatientAssignToDoctor.router.js";
  app.use("/api",patientListAssignToDoctorrouter);
 
+ import labtestlistrouter from "./routes/labtest.route.js";
+app.use("/api",labtestlistrouter);
 
 
+//patient authentication routes
+import patientAuthRouter from "./routes/patientAuth.routes.js";
+app.use("/api",patientAuthRouter);
+
+//Featch the User Whole Details 
+import getPatientDetailsRouter from "./routes/viewPatientDetails.routes.js";
+app.use("/api", getPatientDetailsRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

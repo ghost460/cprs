@@ -26,6 +26,7 @@ enum Role {
   DOCTOR
   LAB_TECHNICIAN
   ADMIN
+  SUPERADMIN
 }
 
 model Doctor {
@@ -135,6 +136,9 @@ model LabTechnician {
 
   user User?
    labTests         LabTest[]
+
+   hospitalId      Int?
+  hospital        Hospital?  @relation(fields: [hospitalId], references: [id])
 }
 
 model Hospital {
@@ -156,6 +160,7 @@ model Hospital {
   user          User?
   doctors              DoctorHospital[]
   medicalHistories MedicalHistory[]
+  labTechnicians       LabTechnician[]
 
   
  

@@ -7,12 +7,12 @@ import { Apierror } from '../utils/Apierror.js';
 
 const prisma = new PrismaClient();
 
-function generateAccessToken(user) {
+function generateAccessToken(patient) {
   return jwt.sign(
     {
-      id: user.id,
-      username: user.username,
-      role: user.role,
+      id: patient.id,
+      username: patient.fullName,
+      role: "PATIENT",
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -21,93 +21,53 @@ function generateAccessToken(user) {
   );
 }
 
-function generateRefreshToken(user) {
-  return jwt.sign(
-    {
-      id: user.id,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY, // e.g., '7d'
-    }
-  );
-}
 
-async function loginUser(req, res) {
-  const { username, password } = req.body;
+
+async function loginPatient(req, res) {
+  const { email, password } = req.body;
+  console.log(email, password);
     
   try {
     // Find the user by username
-    const user = await prisma.user.findUnique({
+    const patient = await prisma.Patient.findUnique({
       where: {
-        username: username,
+        email: email,
       },
     });
+    console.log("Patient Data",patient)
     
-    if (!user) {
+    if (!email) {
       return res.status(404).json({ error: 'User not found' });
     }
    
     // Check if the password is correct
-    const isCorrect = await bcrypt.compare(password, user.password);
+    const isCorrect = await bcrypt.compare(password, patient.password);
         
     if (!isCorrect) {
+      
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-
-    // Generate tokens
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
     
-    // Store the refresh token in the database
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken },
-    });
-
+    // Generate tokens
+    const accessToken = generateAccessToken(patient);
+   
+    console.log("Password correct")
+   
     // Send tokens as cookies
     res.cookie('accessToken', accessToken, {
       httpOnly: false,
       secure: true, // Use secure cookies in production
       sameSite: 'None',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: false,
-      secure: true,
-      sameSite: 'None', 
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 200 * 60 * 1000, // 15 minutes
     });
 
     // Prepare user data to send to the frontend
     const userData = {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        fullName: user.fullName, // Assuming you have `fullName` in your user model
-        profilePicture: user.profilePicture,
+        id: patient.id,
+        fullName: patient.fullName,
+        role: "PATIENT",
+        profilePicture: patient.profilePicture,
       };
-  
-      if (user.role === 'DOCTOR' && user.doctorId) {
-        const doctor = await prisma.doctor.findUnique({
-          where: { id: user.doctorId },
-        });
-        Object.assign(userData, { doctorId: user.doctorId, fullName: doctor.fullName, profilePicture:doctor.profilePicture });
-      } else if (user.role === 'LAB_TECHNICIAN' && user.labTechnicianId) {
-        const labtechnician = await prisma.labTechnician.findUnique({
-          where: { id: user.labTechnicianId },
-        });
-        Object.assign(userData, { labTechnicianId: user.labTechnicianId, fullName: labtechnician.fullName, profilePicture:labtechnician.profilePicture, HospitalId:labtechnician.hospitalId });
-      } else if (user.role === 'ADMIN' && user.HospitalId) {
-        const hospital = await prisma.hospital.findUnique({
-          where: { id: user.HospitalId },
-        });
-        Object.assign(userData, { HospitalId: user.HospitalId, fullName: hospital.hospitalName });
-      }
-  
-  
-
     res.status(200).json({ message: 'Login successful', 
         userData
      });
@@ -119,37 +79,12 @@ async function loginUser(req, res) {
 
 
 //logout controller 
-async function logoutUser(req, res) {
-    const { refreshToken } = req.cookies;
-  
-    if (!refreshToken) return res.sendStatus(204); // No content
-  
-    try {
-      // Find the user with the refresh token
-      const user = await prisma.user.findFirst({
-        where: { refreshToken },
-      });
-  
-      if (!user) {
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
-        return res.sendStatus(204); // No content
-      }
-  
-      // Delete the refresh token in the database
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { refreshToken: null },
-      });
-  
+async function logoutPatient(req, res) {
       // Clear cookies
       res.clearCookie('accessToken');
-      res.clearCookie('refreshToken');
       res.status(200).json({ message: 'Logout successful' });
-    } catch (error) {
-      res.status(500).json({ error: 'An error occurred during logout' });
     }
-  }
+   
 
 
   const refreshAccessToken = ascynHandlar(async (req, res) => {
@@ -208,6 +143,6 @@ async function logoutUser(req, res) {
     });
   }
   
-  export { loginUser, logoutUser, generateAccessToken, generateRefreshToken, refreshAccessToken, authenticateToken};
+  export { loginPatient,logoutPatient };
   
  

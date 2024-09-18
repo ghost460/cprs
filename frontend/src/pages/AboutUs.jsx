@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import "./AboutUs.css";
 import "../Components/Dashboard";
 import Dashboard from "../Components/Dashboard";
+import { Link } from "react-router-dom";
 
 const AboutUs = () => {
   return (
@@ -35,11 +36,12 @@ const AboutUs = () => {
             medical records, fostering a collaborative and transparent
             healthcare environment.
           </p>
+
           <Button
             variant="contained"
             color="primary"
             className="register-button"
-            onClick={() => (window.location.href = "/register")}
+            onClick={() => (window.location.href = "/Emailverify")}
           >
             Register Now
           </Button>

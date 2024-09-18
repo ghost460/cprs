@@ -5,9 +5,9 @@ import { Table, Button, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
-const PatientList = () => {
+const LabTestList = () => {
   const [patientList, setPatientList] = useState([]);
-  const [doctorId, setDoctorId] = useState(null);
+  const [hospitalId, setHospitalId] = useState();
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -15,19 +15,19 @@ const PatientList = () => {
     // Retrieve the 'user' object from local storage
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
-      setDoctorId(user.doctorId);
+      setHospitalId(user.HospitalId);
     }
 
     const fetchPatients = async () => {
-      if (doctorId) {
+      if (hospitalId) {
         try {
           const response = await axios.get(
-            "http://localhost:5000/api/PatientAssigToDoctor",
+            "http://localhost:5000/api/LabTestList",
             {
-              params: { doctorId },
+              params: { hospitalId },
             }
           );
-          setPatientList(response.data.medicalHistories || []);
+          setPatientList(response.data.labtestlist || []);
         } catch (err) {
           console.error("Error fetching patients:", err);
           setError("Failed to fetch patients.");
@@ -36,18 +36,18 @@ const PatientList = () => {
     };
 
     fetchPatients();
-  }, [doctorId]);
+  }, [hospitalId]);
 
-  const handleProceed = (Id, fullName, patientId) => {
-    navigate(`/PatientMedicalHistory/${Id}`, {
-      state: { Id, fullName, patientId },
+  const handleProceed = (Id) => {
+    navigate(`/LabTestReport/${Id}`, {
+      state: { Id },
     });
   };
 
   return (
     <Adminpanel>
       <div>
-        <h1>Today's Patients</h1>
+        <h1>Lab Test List</h1>
         {error && <Alert variant="danger">{error}</Alert>}
         {patientList.length > 0 ? (
           <Table striped bordered hover responsive>
@@ -55,9 +55,8 @@ const PatientList = () => {
               <tr>
                 <th>ID</th>
                 <th>Full Name</th>
-                <th>Address</th>
-                <th>Contact Number</th>
-                <th>Email</th>
+                <th>Test Type</th>
+                <th>Test Items</th>
                 <th>Visit Date</th>
                 <th>Action</th>
               </tr>
@@ -67,9 +66,8 @@ const PatientList = () => {
                 <tr key={entry.id}>
                   <td>{entry.id}</td>
                   <td>{entry.patient.fullName}</td>
-                  <td>{`${entry.patient.add_area}, ${entry.patient.add_wardno}, ${entry.patient.add_munciplity}, ${entry.patient.add_district}, ${entry.patient.add_province}`}</td>
-                  <td>{entry.patient.contactNo}</td>
-                  <td>{entry.patient.email}</td>
+                  <td>{entry.latesttype}</td>
+                  <td>{entry.LabtestItems}</td>
                   <td>{new Date(entry.visitDate).toLocaleDateString()}</td>
                   <td>
                     <Button
@@ -93,4 +91,4 @@ const PatientList = () => {
   );
 };
 
-export default PatientList;
+export default LabTestList;
