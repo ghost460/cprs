@@ -91,6 +91,8 @@ model MedicalHistory {
   refersToTest       Boolean   // Whether the doctor refers to a lab test
   labtesttype        String
   LabtestItems       String
+  diseasecatagory     String @default("Infectious Diseases")
+  diseasesubcatagory  String @default("Bacterial Infections")
   doctorPrescription String    // Prescribed medication for the patient
 
   doctorId           Int?

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {DoctorReg, searchDoctor, updateDoctor} from "../controllers/doctorreg.controller.js";
+import {countDoctors, DoctorReg, searchDoctor, updateDoctor} from "../controllers/doctorreg.controller.js";
 import { upload } from "../middlewares/multer.js";
 const doctorrouter= Router()
 doctorrouter.post('/DoctorReg',
@@ -20,4 +20,5 @@ doctorrouter.post('/DoctorReg',
             }
         ]),
         updateDoctor);
+        doctorrouter.get('/CountDoctor',countDoctors)
     export default doctorrouter;

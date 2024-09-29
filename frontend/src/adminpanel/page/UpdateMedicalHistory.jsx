@@ -3,6 +3,146 @@ import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// Sample disease categories and subcategories (this can be fetched from an API)
+const diseaseData = {
+  "Infectious Diseases": [
+    "Bacterial Infections",
+    "Viral Infections",
+    "Fungal Infections",
+    "Parasitic Infections",
+    "Sexually Transmitted Infections",
+    "Zoonotic Diseases",
+  ],
+  "Cardiovascular Diseases": [
+    "Coronary Artery Disease",
+    "Heart Failure",
+    "Hypertension",
+    "Arrhythmias",
+    "Congenital Heart Disease",
+    "Peripheral Artery Disease",
+  ],
+  "Respiratory Diseases": [
+    "Asthma",
+    "COPD",
+    "Pneumonia",
+    "Bronchitis",
+    "Tuberculosis",
+    "Lung Cancer",
+  ],
+  "Neurological Disorders": [
+    "Alzheimer's Disease",
+    "Parkinson's Disease",
+    "Multiple Sclerosis",
+    "Epilepsy",
+    "Stroke",
+    "Migraine",
+  ],
+  "Gastrointestinal Diseases": [
+    "Irritable Bowel Syndrome",
+    "Gastritis",
+    "Crohn's Disease",
+    "Ulcerative Colitis",
+    "Liver Cirrhosis",
+    "Hepatitis",
+  ],
+  "Endocrine Disorders": [
+    "Diabetes Mellitus",
+    "Hypothyroidism",
+    "Hyperthyroidism",
+    "Cushing's Syndrome",
+    "Addison's Disease",
+    "Polycystic Ovary Syndrome (PCOS)",
+  ],
+  "Musculoskeletal Diseases": [
+    "Osteoarthritis",
+    "Rheumatoid Arthritis",
+    "Osteoporosis",
+    "Gout",
+    "Fibromyalgia",
+    "Tendinitis",
+  ],
+  Cancers: [
+    "Breast Cancer",
+    "Prostate Cancer",
+    "Lung Cancer",
+    "Colorectal Cancer",
+    "Leukemia",
+    "Melanoma",
+  ],
+  "Skin Disorders": [
+    "Psoriasis",
+    "Eczema",
+    "Acne",
+    "Rosacea",
+    "Vitiligo",
+    "Skin Cancer",
+  ],
+  "Psychiatric Disorders": [
+    "Depression",
+    "Anxiety Disorders",
+    "Bipolar Disorder",
+    "Schizophrenia",
+    "Obsessive-Compulsive Disorder",
+    "Post-Traumatic Stress Disorder (PTSD)",
+  ],
+  "Genetic Disorders": [
+    "Down Syndrome",
+    "Cystic Fibrosis",
+    "Sickle Cell Anemia",
+    "Hemophilia",
+    "Huntington's Disease",
+    "Duchenne Muscular Dystrophy",
+  ],
+  "Autoimmune Diseases": [
+    "Systemic Lupus Erythematosus",
+    "Rheumatoid Arthritis",
+    "Celiac Disease",
+    "Graves' Disease",
+    "Hashimoto's Thyroiditis",
+    "Type 1 Diabetes",
+  ],
+  "Nutritional and Metabolic Disorders": [
+    "Obesity",
+    "Malnutrition",
+    "Hyperlipidemia",
+    "Phenylketonuria (PKU)",
+    "Metabolic Syndrome",
+    "Anemia",
+  ],
+  "Hematologic Disorders": [
+    "Anemia",
+    "Thalassemia",
+    "Hemophilia",
+    "Leukopenia",
+    "Thrombocytopenia",
+    "Sickle Cell Disease",
+  ],
+  "Renal Diseases": [
+    "Chronic Kidney Disease",
+    "Acute Kidney Injury",
+    "Kidney Stones",
+    "Nephrotic Syndrome",
+    "Polycystic Kidney Disease",
+    "Glomerulonephritis",
+  ],
+  "Reproductive System Disorders": [
+    "Endometriosis",
+    "Prostatitis",
+    "Erectile Dysfunction",
+    "Pelvic Inflammatory Disease",
+    "Uterine Fibroids",
+    "Ovarian Cysts",
+  ],
+  "Eye Disorders": [
+    "Cataracts",
+    "Glaucoma",
+    "Macular Degeneration",
+    "Diabetic Retinopathy",
+    "Retinal Detachment",
+    "Conjunctivitis",
+  ],
+};
+
 const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
   const [formData, setFormData] = useState({
     id: medicalHistoryId,
@@ -13,7 +153,11 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
     labtesttype: "",
     LabtestItems: "",
     doctorPrescription: "",
+    diseasecatagory: "",
+    diseasesubcatagory: "",
   });
+
+  const [filteredSubcategories, setFilteredSubcategories] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -34,8 +178,9 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
             labtesttype,
             LabtestItems,
             doctorPrescription,
+            diseasecatagory,
+            diseasesubcatagory,
           } = response.data.data?.[0] || {};
-          //   console.log(response.data.data);
 
           setFormData({
             id,
@@ -46,7 +191,14 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
             labtesttype,
             LabtestItems,
             doctorPrescription,
+            diseasecatagory,
+            diseasesubcatagory,
           });
+
+          // Set filtered subcategories based on the fetched disease category
+          if (diseasecatagory) {
+            setFilteredSubcategories(diseaseData[diseasecatagory] || []);
+          }
         } catch (err) {
           console.error("Error fetching medical history:", err);
           setError("Failed to fetch medical history.");
@@ -59,10 +211,24 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+
+    // Handle form field changes
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
+
+    // Update subcategories and reset subcategory if diseaseCategory changes
+    if (name === "diseasecatagory") {
+      const selectedCategory = diseaseData[value] || [];
+      setFilteredSubcategories(selectedCategory);
+
+      // Reset diseaseSubcategory after updating subcategories
+      setFormData((prevData) => ({
+        ...prevData,
+        diseasesubcatagory: "",
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -152,6 +318,43 @@ const UpdateMedicalHistory = ({ medicalHistoryId, onClose }) => {
                 onChange={handleChange}
                 placeholder="Enter lab test items"
               />
+            </Form.Group>
+
+            {/* Disease Category Dropdown */}
+            <Form.Group controlId="formDiseaseCategory">
+              <Form.Label>Disease Category</Form.Label>
+              <Form.Control
+                as="select"
+                name="diseasecatagory"
+                value={formData.diseasecatagory}
+                onChange={handleChange}
+              >
+                <option value="">Select Category</option>
+                {Object.keys(diseaseData).map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            {/* Disease Subcategory Dropdown */}
+            <Form.Group controlId="formDiseaseSubcategory">
+              <Form.Label>Disease Subcategory</Form.Label>
+              <Form.Control
+                as="select"
+                name="diseasesubcatagory"
+                value={formData.diseasesubcatagory}
+                onChange={handleChange}
+                disabled={!formData.diseasecatagory}
+              >
+                <option value="">Select Subcategory</option>
+                {filteredSubcategories.map((subcategory) => (
+                  <option key={subcategory} value={subcategory}>
+                    {subcategory}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
 
             <Form.Group controlId="formDoctorPrescription">

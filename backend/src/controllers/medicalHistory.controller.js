@@ -31,6 +31,8 @@ const prisma = new PrismaClient();
             labtesttype: '', 
             LabtestItems: '', 
             doctorPrescription: '', 
+            diseasecatagory:'',
+            diseasesubcatagory:''
           },
         });
     
@@ -91,6 +93,8 @@ const prisma = new PrismaClient();
         labtesttype ,
         LabtestItems ,
         doctorPrescription ,
+        diseasecatagory,
+        diseasesubcatagory
       } = req.body;
 
   
@@ -115,6 +119,8 @@ const prisma = new PrismaClient();
           labtesttype,
           LabtestItems,
           doctorPrescription,
+          diseasecatagory,
+          diseasesubcatagory
         },
       });
   
@@ -132,6 +138,22 @@ const prisma = new PrismaClient();
         message: "Failed to update medical history.",
         error: error.message,
       });
+    }
+  };
+
+  export const diseasechart = async (req, res) => {
+    try {
+      const diseaseCounts = await prisma.medicalHistory.groupBy({
+        by: ['diseasecatagory'],
+        _count: {
+          diseasecatagory: true,
+        },
+      });
+  
+      res.json(diseaseCounts);
+    } catch (error) {
+      console.error('Error fetching disease Category Count count:', error);
+      res.status(500).json({ error: 'An error occurred while fetching the doctor count.' });
     }
   };
   

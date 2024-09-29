@@ -75,3 +75,15 @@ export const registerHospital = async (req, res) => {
     res.status(500).json({ error: 'Error registering hospital' });
   }
 };
+export const countHospitals = async (req, res) => {
+  try {
+    const totalHospitals = await prisma.hospital.count();
+    res.status(200).json({
+      message: 'Total number of registered Hospitals',
+      totalHospitals,
+    });
+  } catch (error) {
+    console.error('Error fetching doctor count:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the doctor count.' });
+  }
+};

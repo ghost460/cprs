@@ -60,6 +60,9 @@ const LabTechnicianForm = () => {
     <Adminpanel>
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
+          <h4>LabTechnician Registration </h4>{" "}
+        </Row>
+        <Row className="mb-3">
           <Col>
             <Form.Group controlId="fullName">
               <Form.Label>Full Name</Form.Label>

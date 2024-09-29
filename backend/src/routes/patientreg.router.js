@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {patientReg} from "../controllers/patientreg.controller.js"
+import {countPatients, patientReg} from "../controllers/patientreg.controller.js"
 import { upload } from "../middlewares/multer.js";
 const patientregrouter= Router()
 patientregrouter.post('/patientReg',
@@ -10,4 +10,5 @@ patientregrouter.post('/patientReg',
         }
     ]),
     patientReg);
+    patientregrouter.get('/countPatient',countPatients);
     export default patientregrouter;

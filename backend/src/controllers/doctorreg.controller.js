@@ -161,4 +161,16 @@ export const updateDoctor = ascynHandlar(async (req, res) => {
       }
     }
   });
+  export const countDoctors = async (req, res) => {
+    try {
+      const totalDoctors = await prisma.doctor.count();
+      res.status(200).json({
+        message: 'Total number of registered doctors',
+        totalDoctors,
+      });
+    } catch (error) {
+      console.error('Error fetching doctor count:', error);
+      res.status(500).json({ error: 'An error occurred while fetching the doctor count.' });
+    }
+  };
   

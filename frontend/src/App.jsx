@@ -29,6 +29,8 @@ import UpdateMedicalHistory from "./adminpanel/page/UpdateMedicalHistory.jsx";
 import LabTestList from "./adminpanel/page/LabTestList.jsx";
 import LabTestForm from "./adminpanel/page/LabtestForm.jsx";
 import PatientView from "./adminpanel/page/PatientView.jsx";
+import HomeAdmin from "./adminpanel/page/Home.jsx";
+import Dignosis from "./adminpanel/page/Dignosis.jsx";
 
 function App() {
   return (
@@ -53,7 +55,7 @@ function App() {
                   "PATIENT",
                 ]}
               >
-                <Adminpanel />
+                <HomeAdmin />
               </ProtectedRoute>
             }
           />
@@ -145,6 +147,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["PATIENT"]}>
                 <PatientView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Dignosis"
+            element={
+              <ProtectedRoute allowedRoles={["PATIENT"]}>
+                <Dignosis />
               </ProtectedRoute>
             }
           />

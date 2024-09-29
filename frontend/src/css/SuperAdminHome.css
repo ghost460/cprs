@@ -1,0 +1,90 @@
+.fancy-dashboard {
+    padding: 40px;
+    background-color: #f9fafb;
+  }
+  
+  .fancy-card {
+    background: linear-gradient(135deg, #6dd5fa 0%, #2980b9 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    margin-top: 40px;
+  }
+  
+  .fancy-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .fancy-card .icon-wrapper {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    animation: pulse 1.5s infinite;
+  }
+  
+  .fancy-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .fancy-text {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .TitleText {
+    font-size: 2.5rem;                /* Large text size */
+    font-weight: bold;             /* Bold text */
+    color: #4b9cd3;                /* Text color */
+    position: absolute;            /* To allow the text to move across the screen */
+    left: -100%;                   /* Start off-screen from the left */
+    width: 100%;                   /* Full width for centering */
+    text-align: center;            /* Center the text */
+    white-space: nowrap;           /* Prevent the text from wrapping */
+    animation: slideIn 5s ease-out 1 forwards;  /* Slide in from left to center */
+    letter-spacing: 3px;           /* Add spacing between letters */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Fancy shadow */
+  }
+  
+  /* Keyframes for sliding from left to right */
+  @keyframes slideIn {
+    0% {
+      left: -100%;   /* Start off-screen to the left */
+    }
+    50% {
+      left: 55%;     /* Midway point, the text is moving */
+      transform: translateX(-50%);  /* Keep it centered */
+    }
+    100% {
+      left: 50%;     /* End at the center */
+      transform: translateX(-50%);  /* Perfectly centered */
+    }
+  }
+  
+  /* Add glow effect on hover */
+  .TitleText:hover {
+    color: #4f08ca;
+    text-shadow: 0px 0px 8px #4b9cd3, 0px 0px 15px #4b9cd3;
+  }
+  

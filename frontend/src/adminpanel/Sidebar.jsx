@@ -28,7 +28,7 @@ export default function Sidebar() {
           <h5 className="sidebartitle">Dashboard</h5>
           <ul className="sidebarlist">
             <li className="sidebarItem">
-              <Link to="/component/pages/Home">
+              <Link to="/Home">
                 <HomeIcon />
                 <span>Home</span>
               </Link>
@@ -86,6 +86,14 @@ export default function Sidebar() {
                 <Link to="/ViewPatientDetails">
                   <ShowChartIcon />
                   <span>View Reports</span>
+                </Link>
+              </li>
+            )}
+            {isAllowed(role, ["PATIENT"]) && (
+              <li className="sidebarItem">
+                <Link to="/Dignosis">
+                  <ShowChartIcon />
+                  <span>Request for dignosis</span>
                 </Link>
               </li>
             )}
