@@ -31,6 +31,7 @@ import LabTestForm from "./adminpanel/page/LabtestForm.jsx";
 import PatientView from "./adminpanel/page/PatientView.jsx";
 import HomeAdmin from "./adminpanel/page/Home.jsx";
 import Dignosis from "./adminpanel/page/Dignosis.jsx";
+import HospitalList from "./adminpanel/page/HospitalList.jsx";
 
 function App() {
   return (
@@ -65,6 +66,15 @@ function App() {
               <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
                 {" "}
                 <Hospitalregister />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/HospitalList"
+            element={
+              <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
+                {" "}
+                <HospitalList />{" "}
               </ProtectedRoute>
             }
           />

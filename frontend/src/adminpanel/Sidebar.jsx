@@ -8,6 +8,7 @@ import SummarizeIcon from "@mui/icons-material/Summarize";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import DoctorReg from "./page/DoctorReg";
 
 export default function Sidebar() {
   const [role, setRole] = useState("");
@@ -46,6 +47,30 @@ export default function Sidebar() {
                 <Link Link to="/HospitalRegistration">
                   <PersonAddIcon />
                   <span>Add Hospital</span>
+                </Link>
+              </li>
+            )}
+            {isAllowed(role, ["SUPERADMIN"]) && (
+              <li className="sidebarItem">
+                <Link Link to="/HospitalList">
+                  <PersonAddIcon />
+                  <span>Hospitals List</span>
+                </Link>
+              </li>
+            )}
+            {isAllowed(role, ["SUPERADMIN"]) && (
+              <li className="sidebarItem">
+                <Link Link to="/HospitalRegistration">
+                  <PersonAddIcon />
+                  <span>Doctors List</span>
+                </Link>
+              </li>
+            )}
+            {isAllowed(role, ["SUPERADMIN"]) && (
+              <li className="sidebarItem">
+                <Link Link to="/">
+                  <PersonAddIcon />
+                  <span>Patients List</span>
                 </Link>
               </li>
             )}
