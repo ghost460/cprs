@@ -1,4 +1,3 @@
-// UpdateDoctor.jsx
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import axios from "axios";
@@ -23,7 +22,19 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
         params: { id: doctorId },
       })
       .then((response) => {
-        setFormData(response.data);
+        const doctor = response.data;
+        setFormData({
+          fullName: doctor.fullName || "",
+          address: doctor.address || "",
+          contactNo: doctor.contactNo || "",
+          email: doctor.email || "",
+          licenseNo: doctor.licenseNo || "",
+          specialization: doctor.specialization || "",
+          experience: doctor.experience || "",
+          username: doctor.username || "",
+          password: "", // Do not preload password
+          profilePicture: null, // New upload only
+        });
       })
       .catch((error) => {
         console.error("Error fetching doctor details:", error);
@@ -39,43 +50,59 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      profilePicture: e.target.files[0],
-    }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prevData) => ({
+        ...prevData,
+        profilePicture: file,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
+
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "profilePicture" && value instanceof File) {
+        data.append("profilePicture", value);
+      } else if (value !== undefined && value !== null && value !== "") {
+        data.append(key, value);
+      }
     });
 
     axios
-      .put(`http://localhost:5000/api/DoctorReg/DoctorReg/${doctorId}`, data)
+      .put(`http://localhost:5000/api/DoctorReg/${doctorId}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((response) => {
         alert("Doctor updated successfully");
         onDoctorUpdated();
         onClose();
       })
       .catch((error) => {
+        const err = error.response?.data?.error;
         console.error("Error updating doctor data:", error);
+        if (err === "Username already taken.") {
+          alert(
+            "The username is already taken. Please choose a different one."
+          );
+        } else {
+          alert("An error occurred while updating doctor information.");
+        }
       });
   };
 
   return (
     <Container>
-      <Row>
-        <Col>
-          <h4>Update Doctor Details</h4>
-        </Col>
-      </Row>
+      <h4 className="mb-3">Update Doctor Details</h4>
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="fullName">
+            <Form.Group controlId="fullName">
               <Form.Label>Full Name</Form.Label>
               <Form.Control
                 type="text"
@@ -85,9 +112,8 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
               />
             </Form.Group>
           </Col>
-
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="address">
+            <Form.Group controlId="address">
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
@@ -97,9 +123,8 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
               />
             </Form.Group>
           </Col>
-
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="contactNo">
+            <Form.Group controlId="contactNo">
               <Form.Label>Contact Number</Form.Label>
               <Form.Control
                 type="text"
@@ -113,44 +138,7 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
 
         <Row>
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="licenseNo">
-              <Form.Label>License Number</Form.Label>
-              <Form.Control
-                type="text"
-                name="licenseNo"
-                value={formData.licenseNo}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-
-          <Col md={4}>
-            <Form.Group className="mb-3" controlId="specialization">
-              <Form.Label>Specialization</Form.Label>
-              <Form.Control
-                type="text"
-                name="specialization"
-                value={formData.specialization}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            <Form.Group className="mb-3" controlId="experience">
-              <Form.Label>Experience (years)</Form.Label>
-              <Form.Control
-                type="number"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col md={4}>
-            <Form.Group className="mb-3" controlId="email">
+            <Form.Group controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
@@ -160,10 +148,45 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
               />
             </Form.Group>
           </Col>
-
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="username">
-              <Form.Label>username</Form.Label>
+            <Form.Group controlId="licenseNo">
+              <Form.Label>License Number</Form.Label>
+              <Form.Control
+                type="text"
+                name="licenseNo"
+                value={formData.licenseNo}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="specialization">
+              <Form.Label>Specialization</Form.Label>
+              <Form.Control
+                type="text"
+                name="specialization"
+                value={formData.specialization}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={4}>
+            <Form.Group controlId="experience">
+              <Form.Label>Experience (years)</Form.Label>
+              <Form.Control
+                type="number"
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group controlId="username">
+              <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
                 name="username"
@@ -172,9 +195,8 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
               />
             </Form.Group>
           </Col>
-
           <Col md={4}>
-            <Form.Group className="mb-3" controlId="password">
+            <Form.Group controlId="password">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
@@ -187,8 +209,8 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
         </Row>
 
         <Row>
-          <Col md={4}>
-            <Form.Group className="mb-3" controlId="profilePicture">
+          <Col md={6}>
+            <Form.Group controlId="profilePicture">
               <Form.Label>Profile Picture</Form.Label>
               <Form.Control
                 type="file"
@@ -199,7 +221,7 @@ function UpdateDoctor({ doctorId, onClose, onDoctorUpdated }) {
           </Col>
         </Row>
 
-        <Button variant="primary" type="submit">
+        <Button className="mt-3" variant="primary" type="submit">
           Submit
         </Button>
       </Form>

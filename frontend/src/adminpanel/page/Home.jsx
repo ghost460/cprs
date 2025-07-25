@@ -4,6 +4,7 @@ import Adminpanel from "../Adminpanel";
 import DoctorHome from "../page/DoctorHome";
 import AdminHome from "./AdminHome";
 import { useEffect, useState } from "react";
+import PatientHome from "./PatientHome";
 
 function Home() {
   const [role, setRole] = useState("");
@@ -18,6 +19,7 @@ function Home() {
       {role === "SUPERADMIN" && <SuperAdminHome />}
       {role === "DOCTOR" && <DoctorHome />}
       {role === "ADMIN" && <AdminHome />}
+      {role === "PATIENT" && <PatientHome />}
     </Adminpanel>
   );
 }

@@ -42,6 +42,7 @@ model Doctor {
   user            User?
   medicalHistories MedicalHistory[]
   hospitals       DoctorHospital[]
+  appointments    Appointment[]
 }
 
 
@@ -67,6 +68,7 @@ model Patient {
   profilePicture        String?
   dateOfRegistration    DateTime
   medicalHistories      MedicalHistory[] //Relation to MedicalHistory model 
+  appointments          Appointment[] 
   
 }
 enum DocumentType {
@@ -146,7 +148,13 @@ model LabTechnician {
 model Hospital {
   id                   Int                   @id @default(autoincrement())
   hospitalName         String
-  address              String
+  province               String?               // made optional
+  district               String?               // made optional
+  municipality           String?               // made optional
+  wardNo                 Int?                  // made optional
+  street                 String?               // made optional
+  latitude               Float?                // made optional
+  longitude              Float? 
   numberOfBeds         Int
   email                String
   specialization       String
@@ -163,6 +171,7 @@ model Hospital {
   doctors              DoctorHospital[]
   medicalHistories MedicalHistory[]
   labTechnicians       LabTechnician[]
+  appointments         Appointment[]   
 
   
  
@@ -207,7 +216,27 @@ model ContactNumbers {
 }
 
 
+model Appointment {
+  id            Int       @id @default(autoincrement())
+  appointmentAt DateTime
+  status        AppointmentStatus @default(PENDING)
 
+  doctorId      Int
+  patientId     Int
+  hospitalId    Int
+  problem       String
+
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  hospital      Hospital @relation(fields: [hospitalId], references: [id])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
  
 
 

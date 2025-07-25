@@ -17,12 +17,18 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Adminpanel from "../Adminpanel";
-import AddressSelector from "../../Components/AddressSelector";
+import AddressSelector from "../../Components/Address";
 
 function Hospitalregister() {
   const [formData, setFormData] = useState({
     hospitalName: "",
-    address: "",
+    province: "",
+    district: "",
+    municipality: "",
+    wardNo: "",
+    street: "",
+    latitude: "",
+    longitude: "",
     numberOfBeds: "",
     email: "",
     specialization: "",
@@ -103,14 +109,8 @@ function Hospitalregister() {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} md={8}>
-              <TextField
-                label="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
+            <Grid item xs={12}>
+              <AddressSelector formData={formData} setFormData={setFormData} />
             </Grid>
             <Grid item xs={12} md={4}>
               <TextField

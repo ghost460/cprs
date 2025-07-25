@@ -121,3 +121,28 @@ const patientReg = ascynHandlar(async (req, res) => {
 };
 
 export  {patientReg, countPatients}
+
+// Existing imports assumed
+export const getAllPatients = async (req, res) => {
+  try {
+    const patients = await prisma.patient.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        gender: true,
+        contactNo: true,
+        email: true,
+        add_province: true,
+        add_district: true,
+        add_munciplity: true,
+        add_wardno: true,
+        add_area: true,
+      },
+    });
+
+    res.status(200).json(patients);
+  } catch (error) {
+    console.error('Error fetching patients:', error);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+};

@@ -6,7 +6,7 @@ function Adminpanel({ children }) {
   return (
     <div>
       <Topbar />
-      <div className="cont">
+      <div className="cont ">
         <Sidebar />
         <div className="others">{children}</div>
       </div>

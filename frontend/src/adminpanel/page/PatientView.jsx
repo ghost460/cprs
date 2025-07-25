@@ -42,23 +42,6 @@ function PatientView() {
   return (
     <Adminpanel>
       <div className="patient-details">
-        <h1>Patient Information</h1>
-        <p>
-          <strong>MedicalID:</strong> {patientData.id}
-        </p>
-        <p>
-          <strong>Name:</strong> {patientData.fullName}
-        </p>
-        <p>
-          <strong>Date of Birth:</strong> {patientData.dateOfBirth}
-        </p>
-        <p>
-          <strong>Gender:</strong> {patientData.gender}
-        </p>
-        <p>
-          <strong>Contact No:</strong> {patientData.contactNo}
-        </p>
-
         <h2>Medical History</h2>
         {patientData.medicalHistories.map((history) => (
           <div key={history.id} className="medical-history">

@@ -6,7 +6,13 @@ const prisma = new PrismaClient();
 export const registerHospital = async (req, res) => {
   const {
     hospitalName,
-    address,
+    province,
+    district,
+    municipality,
+    wardNo,
+    street,
+    latitude,
+    longitude,
     numberOfBeds,
     email,
     specialization,
@@ -45,12 +51,23 @@ export const registerHospital = async (req, res) => {
       data: contactNumbers,
     });
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+const wardNoInt = parseInt(wardNo, 10);
+const Lat = parseFloat(latitude);
+const Lon = parseFloat(longitude);
+
 
     // Create hospital entry
     const hospital = await prisma.hospital.create({
       data: {
         hospitalName,
-        address,
+        province,
+    district,
+    municipality,
+    wardNo:wardNoInt,
+    street,
+    latitude:Lat,
+    longitude:Lon,
         numberOfBeds: parseInt(numberOfBeds, 10),
         email,
         specialization,
@@ -87,3 +104,37 @@ export const countHospitals = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching the doctor count.' });
   }
 };
+
+//hospital list featch 
+export const Hospitallist = async(req, res)=>{
+  try {
+    const hospitals = await prisma.hospital.findMany({
+      select: {
+        id: true,
+        hospitalName: true,
+        province: true,
+        district: true,
+        municipality: true,
+        wardNo: true,
+        street: true,
+        latitude: true,
+        longitude: true,
+        numberOfBeds: true,
+        email: true,
+        specialization: true,
+        organizationalType: true,
+        levelOfCare: true,
+        servicesOffered: true,
+        availableEquipments: true,
+        contactNumbers: true,
+        // EXCLUDE user.username and user.password
+        // You can include user but without sensitive info if needed
+      }
+    });
+
+    res.json(hospitals);
+  } catch (error) {
+    console.error('Error fetching hospitals:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+}

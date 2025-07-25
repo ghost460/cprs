@@ -104,63 +104,88 @@ export const searchDoctor = async (req, res) => {
 };
 
 //update controller 
+
 export const updateDoctor = ascynHandlar(async (req, res) => {
-    const { id } = req.params; // Get the doctor ID from the request params
-    const { fullName, address, contactNo, email, licenseNo, username, password, specialization, experience } = req.body;
-    const profilePictureLocalPath = req.files?.profilePicture?.[0]?.path; // Safely access profilePicture
-  
-    try {
-      // Check if the doctor exists
-      const existingDoctor = await prisma.doctor.findUnique({
-        where: { id: parseInt(id) },
+  const { id } = req.params;
+  const {
+    fullName,
+    address,
+    contactNo,
+    email,
+    licenseNo,
+    username,
+    password,
+    specialization,
+    experience,
+  } = req.body;
+
+  const profilePictureLocalPath = req.files?.profilePicture?.[0]?.path;
+
+  try {
+    // Find doctor by ID with related user
+    const existingDoctor = await prisma.doctor.findUnique({
+      where: { id: parseInt(id) },
+      include: { user: true },
+    });
+
+    if (!existingDoctor) {
+      return res.status(404).json({ error: "Doctor not found." });
+    }
+
+    // ✅ Check for username conflict only if changed
+    if (username && username !== existingDoctor.user.username) {
+      const existingUser = await prisma.user.findUnique({
+        where: { username },
       });
-  
-      if (!existingDoctor) {
-        return res.status(404).json({ error: "Doctor not found." });
-      }
-  
-      // Upload profile picture if provided
-      let profilePicture = existingDoctor.profilePicture; // retain the old profile picture by default
-  
-      if (profilePictureLocalPath) {
-        profilePicture = await uploadoncloud(profilePictureLocalPath);
-      }
-  
-      // Hash the password before saving it if provided
-      const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-  
-      // Update the doctor record
-      const updatedDoctor = await prisma.doctor.update({
-        where: { id: parseInt(id) },
-        data: {
-          fullName,
-          address,
-          contactNo,
-          email,
-          licenseNo,
-          specialization,
-          experience: parseInt(experience, 10),
-          profilePicture: profilePicture ? profilePicture.url : existingDoctor.profilePicture,
-          user: {
-            update: {
-              username,
-              // Only update password if a new one is provided
-              ...(hashedPassword && { password: hashedPassword }),
-            },
-          },
-        },
-      });
-  
-      res.json({ message: 'Doctor updated successfully', updatedDoctor });
-    } catch (error) {
-      console.error("Error updating doctor data:", error);
-      if (error instanceof Apierror) {
-        res.status(error.statusCode).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: 'An error occurred while updating the doctor.' });
+
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already taken." });
       }
     }
-  });
+
+    // ✅ Upload profile picture to cloud if new one provided
+    let profilePicture = existingDoctor.profilePicture;
+    if (profilePictureLocalPath) {
+      const uploaded = await uploadoncloud(profilePictureLocalPath);
+      profilePicture = uploaded.url;
+    }
+
+    // ✅ Hash password only if a new one is provided
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+
+    // ✅ Update doctor and linked user data
+    const updatedDoctor = await prisma.doctor.update({
+      where: { id: parseInt(id) },
+      data: {
+        fullName,
+        address,
+        contactNo,
+        email,
+        licenseNo,
+        specialization,
+        experience: parseInt(experience, 10),
+        profilePicture,
+        user: {
+          update: {
+            username,
+            ...(hashedPassword && { password: hashedPassword }),
+          },
+        },
+      },
+      include: { user: true },
+    });
+
+    res.status(200).json({ message: "Doctor updated successfully", doctor: updatedDoctor });
+  } catch (error) {
+    console.error("Error updating doctor:", error);
+    if (error instanceof ApiError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An error occurred while updating the doctor." });
+    }
+  }
+});
+
   export const countDoctors = async (req, res) => {
     try {
       const totalDoctors = await prisma.doctor.count();
@@ -173,4 +198,49 @@ export const updateDoctor = ascynHandlar(async (req, res) => {
       res.status(500).json({ error: 'An error occurred while fetching the doctor count.' });
     }
   };
-  
+
+  // ✅ Get all doctors
+export const getAllDoctors = async (req, res) => {
+  try {
+    const { role, hospitalId } = req.query;
+
+    let doctors = [];
+
+    if (role === "SUPERADMIN") {
+      // Return all doctors
+      doctors = await prisma.doctor.findMany();
+    } else if (role === "ADMIN") {
+      if (!hospitalId) {
+        return res.status(400).json({ error: "Hospital ID required for ADMIN" });
+      }
+
+      // Fetch doctors only from that hospital
+      const hospitalWithDoctors = await prisma.hospital.findUnique({
+        where: {
+          id: parseInt(hospitalId),
+        },
+        include: {
+          doctors: {
+            include: {
+              doctor: true,
+            },
+          },
+        },
+      });
+
+      if (!hospitalWithDoctors) {
+        return res.status(404).json({ error: "Hospital not found" });
+      }
+
+      // Extract doctors from junction table
+      doctors = hospitalWithDoctors.doctors.map((dh) => dh.doctor);
+    } else {
+      return res.status(403).json({ error: "Unauthorized role" });
+    }
+
+    res.json(doctors);
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ error: "Failed to fetch doctors" });
+  }
+};

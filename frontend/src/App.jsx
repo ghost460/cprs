@@ -30,8 +30,16 @@ import LabTestList from "./adminpanel/page/LabTestList.jsx";
 import LabTestForm from "./adminpanel/page/LabtestForm.jsx";
 import PatientView from "./adminpanel/page/PatientView.jsx";
 import HomeAdmin from "./adminpanel/page/Home.jsx";
-import Dignosis from "./adminpanel/page/Dignosis.jsx";
+import Doctor_appointment from "./adminpanel/page/Doctor_appointment.jsx";
 import HospitalList from "./adminpanel/page/HospitalList.jsx";
+import AppointmentRequest from "./adminpanel/page/RequestedAppointmentDisplayOnAdminDoctor.jsx";
+import MyAppointments from "./Components/MyAppointments.jsx";
+import ChatRoom from "./Components/ChatBox.jsx";
+import ConferenceRoom from "./Components/VideoCallLink.jsx";
+import ChatPage from "./Components/ChatPage.jsx";
+import TelemedicineRoom from "./Components/TelemedicineRoom.jsx";
+import DoctorList from "./adminpanel/page/DoctorList.jsx";
+import GetAllPatientList from "./adminpanel/page/GetALLPatientList.jsx";
 
 function App() {
   return (
@@ -75,6 +83,24 @@ function App() {
               <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
                 {" "}
                 <HospitalList />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DoctorList"
+            element={
+              <ProtectedRoute allowedRoles={["SUPERADMIN", "ADMIN"]}>
+                {" "}
+                <DoctorList />{" "}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/AllPatientList"
+            element={
+              <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
+                {" "}
+                <GetAllPatientList />{" "}
               </ProtectedRoute>
             }
           />
@@ -161,10 +187,50 @@ function App() {
             }
           />
           <Route
-            path="/Dignosis"
+            path="/Doctor_appointment"
             element={
               <ProtectedRoute allowedRoles={["PATIENT"]}>
-                <Dignosis />
+                <Doctor_appointment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/AppointmentRequest"
+            element={
+              <ProtectedRoute allowedRoles={["DOCTOR", "ADMIN"]}>
+                <AppointmentRequest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/MyAppointments"
+            element={
+              <ProtectedRoute allowedRoles={["PATIENT"]}>
+                <MyAppointments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ChatRoom"
+            element={
+              <ProtectedRoute allowedRoles={["DOCTOR", "PATIENT"]}>
+                <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ConferenceRoom"
+            element={
+              <ProtectedRoute allowedRoles={["DOCTOR", "PATIENT"]}>
+                <TelemedicineRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ChatPage"
+            element={
+              <ProtectedRoute allowedRoles={["DOCTOR", "PATIENT"]}>
+                <ChatPage />
               </ProtectedRoute>
             }
           />
