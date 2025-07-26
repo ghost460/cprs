@@ -35,7 +35,7 @@ function generateRefreshToken(user) {
 
 async function loginUser(req, res) {
   const { username, password } = req.body;
-    
+    console.log(username, password);
   try {
     // Find the user by username
     const user = await prisma.user.findUnique({
@@ -50,7 +50,7 @@ async function loginUser(req, res) {
    
     // Check if the password is correct
     const isCorrect = await bcrypt.compare(password, user.password);
-        
+        console.log(await bcrypt.hash(password, 10));
     if (!isCorrect) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {LabTechReg} from "../controllers/labtechreg.controller.js"
+import {LabTechReg, getLabTechnician} from "../controllers/labtechreg.controller.js"
 import { upload } from "../middlewares/multer.js";
 const Labrouter= Router()
 Labrouter.post('/Labtechreg',
@@ -10,4 +10,6 @@ Labrouter.post('/Labtechreg',
         }
     ]),
     LabTechReg);
+    Labrouter.get('/ByHospital', getLabTechnician);
+
     export default Labrouter;

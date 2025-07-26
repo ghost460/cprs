@@ -76,3 +76,21 @@ const LabTechReg = ascynHandlar(async (req, res) => {
 });
 
 export  {LabTechReg}
+
+export const getLabTechnician = ascynHandlar(async (req, res) => {
+  const { hospitalId } = req.query;
+
+  if (!hospitalId) {
+    throw new Apierror(400, "Hospital ID is required");
+  }
+
+  const labTechnicians = await prisma.labTechnician.findMany({
+    where: { hospitalId: parseInt(hospitalId) },
+    include: {
+      user: true, // to get username or role if needed
+    },
+  });
+
+  res.status(200).json(labTechnicians);
+});
+

@@ -40,6 +40,7 @@ import ChatPage from "./Components/ChatPage.jsx";
 import TelemedicineRoom from "./Components/TelemedicineRoom.jsx";
 import DoctorList from "./adminpanel/page/DoctorList.jsx";
 import GetAllPatientList from "./adminpanel/page/GetALLPatientList.jsx";
+import LabTechnicianList from "./adminpanel/page/LabTechnicianList.jsx";
 
 function App() {
   return (
@@ -109,6 +110,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["ADMIN"]}>
                 <LabTechnicianForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/LabTecnicians"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <LabTechnicianList />
               </ProtectedRoute>
             }
           />
